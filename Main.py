@@ -52,7 +52,20 @@ def main():
         append(" | ")
         append(temp_pass)
     else:
-        #ask what sirvise thay whnt to fid password and uername for
-        #find service by looping thu the file reading the line by calling read() function
-        #print output
+        service = input("whats service is this for:")
+        service = service.lower()
+        x = 0
+        while True:
+            line = read(x)
+            x += 1
+            if service in line:
+                print("Service | Username | Password")
+                print(line)
+                break
+        
+
+
+       
+if __name__ == "__main__":
+    main()
 
