@@ -22,6 +22,8 @@ def read(line):
         pass
 
 
+
+
 def append(string):
     try:
         with open(file_path, "r") as file:
