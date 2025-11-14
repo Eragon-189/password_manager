@@ -1,86 +1,102 @@
 import random
-file_path = "passwords.txt"
-#add encription
-separator1 = ""
-separator2 = "\n"
-def make_pass():
-    password = []
-    char_list=["1","2","3","4","5","6","7","8","9","0","!","#","$","%","^","&","*","(",")","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","<",">",",",".","/","?",";",":","{","}","[","]","-","_","+","=","~","`"]
-    for i in range(16):
-        random_char = char_list[random.randint(0, 71)]
-        password.append(random_char)
-    return make_string(password)
+import string
 
+# File path for storing passwords
+FILE_PATH = "passwords.txt"
+# Length of generated passwords
+PASSWORD_LENGTH = 16
+
+
+def make_pass():
+    """Generate a random 16-character password."""
+    # Combine letters, digits, and special characters for password generation
+    chars = string.ascii_letters + string.digits + "!#$%^&*()<>,./?\;:{}[]-_+=~`"
+    # Select random characters from the pool
+    password = [random.choice(chars) for _ in range(PASSWORD_LENGTH)]
+    # Return as a single string
+    return "".join(password)
 
 
 def read(line_number):
+    """Read a specific line from the password file."""
     try:
-        with open(file_path, "r") as file:
-            lines = file.readlines()          # read all lines at once
+        # Open and read all lines from the file
+        with open(FILE_PATH, "r") as file:
+            lines = file.readlines()
+            # Return the line if it exists, remove trailing newline
             if line_number < len(lines):
                 return lines[line_number].rstrip("\n")
+            # Return None if line number is out of range
             return None
     except FileNotFoundError:
+        # Return None if file doesn't exist
         return None
 
 
 
-
 def append(string):
+    """Append a string to the password file."""
     try:
-        with open(file_path, "a") as file:
+        # Open file in append mode and write the string
+        with open(FILE_PATH, "a") as file:
             file.write(str(string))
     except FileExistsError:
+        # Handle case where file operations fail
         pass
 
 
-def make_string(list):
-    string_list = [str(i) for i in list]
-    return separator1.join(string_list)
+
 
 def main():
-    new_password = input("would you like to make a new password. y/n")
-    #checks if you whant a new password
-    if new_password == "y":
-    #asks for email or username to be assosiated with the password
-        user = input("Whats your email/username:")
-    #sets user to lowercase
-        user = user.lower()
-    #asks for service
-        service = input("whats service is this for:")
-    #sets to lowercase
-        service = service.lower()
-        #make password
+    """Main program loop."""
+    # Ask user if they want to create a new password or retrieve one
+    new_password = input("Would you like to make a new password? (y/n): ")
+    
+    if new_password.lower() == "y":
+        # Path for creating a new password
+        user = input("What's your email/username: ").lower()
+        service = input("What service is this for: ").lower()
+        
+        # Generate and display the new password
         temp_pass = make_pass()
-        #print password 
-        print("your password is:")
+        print("Your password is:")
         print(temp_pass)
-        #append data to file separated by " | "
+        
+        # Append data to file in format: service | username | password
         append(service)
         append(" | ")
         append(user)
         append(" | ")
         append(temp_pass)
+        append("\n")
     else:
-        service = input("whats service is this for:")
-        service = service.lower()
+        # Path for retrieving an existing password
+        service = input("What service is this for: ").lower()
         x = 0
+        
+        # Search through file line by line
         while True:
             line = read(x)
-              # ensure the line has the correct structure using '|' separators
+            # Stop if end of file is reached
+            if line is None:
+                print(f"Service '{service}' not found.")
+                break
+            
+            # Parse line with '|' separators into service, username, and password
             parts = [p.strip() for p in line.split("|")]
-            if len(parts) == 3:              # must be: Service | Username | Password
+            # Ensure the line has the correct format (3 parts)
+            if len(parts) == 3:
                 service_name, username, password = parts
-
-                # compare only service names
+                
+                # Check if service name matches user's search
                 if service in service_name.lower():
                     print("Service | Username | Password")
-                    print(service_name, " | ", username, " | ", password)
+                    print(f"{service_name} | {username} | {password}")
                     break
+            
+            # Move to next line
             x += 1
 
 
-
-
-
-main()
+if __name__ == "__main__":
+    main()
